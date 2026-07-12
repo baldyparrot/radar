@@ -1,0 +1,21 @@
+# Overhead — configuration
+# Phase 1 (simulation) reads this file; later phases add live-data keys.
+
+home: {lat: 43.686, lon: -79.460}   # SET EXACT VALUES (Caledonia & Norman placeholder)
+
+overhead_radius_km: 2.5
+poll_interval_s: 5
+map_detail: minimal        # minimal | full | lofi (rings only)
+panel_dwell_s: 12
+cooldown_s: 45
+queue_threshold: 60
+quiet_hours: {start: "21:30", end: "07:00"}
+units: metric              # always metric, Celsius
+chime: off                 # v2
+
+# --- Phase 1 simulation-only knobs ---
+sim:
+  enabled: true
+  time_scale: 3.0          # run the sim faster than wall-clock so panels appear promptly in a demo
+  px_per_km: 28.6          # projection constant (matches prototype)
+  range_ring_km: 6.0       # the single outer ring kept per §4.1

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Overhead</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <!-- Fixed 800x480 logical stage, scaled to fit any 7" display -->
+  <div id="stage" data-daynight="day">
+    <canvas id="map" width="800" height="480"></canvas>
+
+    <!-- persistent clock chip, top-left (§4.1) -->
+    <div class="clock-chip"><span id="clock">--:--</span></div>
+
+    <!-- idle hint when no planes are up yet -->
+    <div id="idle" class="idle-hint hidden">Watching the sky…</div>
+
+    <!-- right-side slide-in overhead panel (§4.2) -->
+    <aside id="panel" class="panel">
+      <header class="panel-head">
+        <div class="logo-circle"><span id="logoInitials">AC</span></div>
+        <div class="panel-titles">
+          <div id="airlineName" class="airline-name">Airline</div>
+          <div id="flightLine" class="flight-line">FL000 · Aircraft</div>
+        </div>
+      </header>
+
+      <div class="photo-band">
+        <div id="planeArt" class="plane-art"></div>
+        <div id="photoCaption" class="photo-caption">REG · 0 years old</div>
+        <div id="photoAttrib" class="photo-attrib"></div>
+      </div>
+
+      <div class="route-block">
+        <div class="route-end">
+          <div class="route-city"><span id="origFlag">🏳️</span> <span id="origCity">Origin</span></div>
+          <div id="origTime" class="route-time">took off —</div>
+        </div>
+        <div class="route-arrow">➜</div>
+        <div class="route-end">
+          <div class="route-city"><span id="destFlag">🏳️</span> <span id="destCity">Dest</span></div>
+          <div id="destTime" class="route-time">lands —</div>
+        </div>
+      </div>
+
+      <div id="wonder" class="wonder-banner">A fact goes here.</div>
+
+      <div class="drain"><div id="drainBar" class="drain-bar"></div></div>
+    </aside>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
