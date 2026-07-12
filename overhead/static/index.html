@@ -7,48 +7,78 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <!-- Fixed 800x480 logical stage, scaled to fit any 7" display -->
-  <div id="stage" data-daynight="day">
-    <canvas id="map" width="800" height="480"></canvas>
+  <!-- 800x480 stage, scaled to fill the 7" display. .night toggles palette. -->
+  <div id="stage">
+    <div id="device" data-detail="minimal">
+      <!-- map layer: DOM, evolved from prototype v4 with §4 simplifications.
+           .lm  = kept landmarks (hidden only in lofi)
+           .lm-full = extra detail, shown only when map_detail: full -->
+      <div id="map">
+        <!-- ONE outer range ring (§4.1). 6 km at 28.6 px/km, centred on house (400,230). -->
+        <div class="ring" id="rangeRing"></div>
 
-    <!-- persistent clock chip, top-left (§4.1) -->
-    <div class="clock-chip"><span id="clock">--:--</span></div>
+        <!-- extra rings/labels/cardinals — full detail only -->
+        <div class="ring lm-full" style="left:314px;top:144px;width:172px;height:172px"></div>
+        <div class="ring lm-full" style="left:142px;top:-28px;width:516px;height:516px"></div>
+        <div class="rlbl lm-full" style="left:388px;top:131px">3 km</div>
+        <div class="rlbl lm-full" id="rangeLbl">6 km</div>
+        <div class="cardinal lm-full" style="left:394px;top:5px">N</div>
+        <div class="cardinal lm-full" style="left:12px;top:186px">W</div>
+        <div class="cardinal lm-full" style="right:12px;top:186px">E</div>
 
-    <!-- idle hint when no planes are up yet -->
-    <div id="idle" class="idle-hint hidden">Watching the sky…</div>
+        <!-- roads — full detail only -->
+        <div class="road lm-full" style="left:0;right:0;top:263px;height:4px"></div>
+        <div class="roadlbl lm-full" style="left:150px;top:267px">ST CLAIR AVE W</div>
+        <div class="road lm-full" style="top:0;bottom:36px;left:398px;width:3px"></div>
+        <div class="roadlbl lm-full" style="left:406px;top:90px;writing-mode:vertical-rl">CALEDONIA RD</div>
 
-    <!-- right-side slide-in overhead panel (§4.2) -->
-    <aside id="panel" class="panel">
-      <header class="panel-head">
-        <div class="logo-circle"><span id="logoInitials">AC</span></div>
-        <div class="panel-titles">
-          <div id="airlineName" class="airline-name">Airline</div>
-          <div id="flightLine" class="flight-line">FL000 · Aircraft</div>
-        </div>
-      </header>
+        <!-- kept landmarks (§4.1): lake, Pearson, CN Tower -->
+        <div class="lake lm"></div>
+        <div class="park lm-full" style="left:414px;top:238px;width:34px;height:24px"></div>
+        <div class="lmlbl lm-full" style="left:452px;top:242px">Earlscourt Park</div>
+        <div class="cntower lm" id="cntower"><i class="spire"></i><i class="pod"></i><i class="shaft"></i></div>
+        <div class="lmlbl lm" id="cnlbl">CN Tower</div>
+        <div class="rwy lm-full" style="left:534px;top:424px;width:30px;height:5px;transform:rotate(-6deg)"></div>
+        <div class="lmlbl lm-full" style="left:568px;top:418px">YTZ · Billy Bishop</div>
+        <div class="rwy lm" id="yyz1"></div>
+        <div class="rwy lm" id="yyz2"></div>
+        <div class="lmlbl lm" id="yyzlbl">YYZ · Pearson</div>
 
-      <div class="photo-band">
-        <div id="planeArt" class="plane-art"></div>
-        <div id="photoCaption" class="photo-caption">REG · 0 years old</div>
-        <div id="photoAttrib" class="photo-attrib"></div>
+        <!-- overhead zone + house (always shown) -->
+        <div id="zone"><div class="pulse"></div></div>
+        <div id="house"><div class="roof"></div><div class="body"></div><div class="label">OUR HOUSE</div></div>
       </div>
 
-      <div class="route-block">
-        <div class="route-end">
-          <div class="route-city"><span id="origFlag">🏳️</span> <span id="origCity">Origin</span></div>
-          <div id="origTime" class="route-time">took off —</div>
+      <!-- planes live in an SVG overlay -->
+      <svg id="sky" width="800" height="480" viewBox="0 0 800 480">
+        <g id="planes"></g>
+      </svg>
+
+      <div class="chip" id="clock">🕒 <span id="time">--:--</span></div>
+      <div id="idle" class="hint">Watching the sky…</div>
+
+      <!-- overhead panel — simplified per §4.2 -->
+      <div id="panel">
+        <div class="head">
+          <div class="logo" id="tlogo"></div>
+          <div class="who"><span id="tal"></span><small id="tfl"></small></div>
         </div>
-        <div class="route-arrow">➜</div>
-        <div class="route-end">
-          <div class="route-city"><span id="destFlag">🏳️</span> <span id="destCity">Dest</span></div>
-          <div id="destTime" class="route-time">lands —</div>
+        <div id="band">
+          <svg id="psvg" width="300" height="112" viewBox="0 0 460 120"></svg>
+          <div class="cap" id="tcap"></div>
+          <div class="attrib" id="tattrib"></div>
         </div>
+        <div id="route">
+          <div class="ept"><div class="city" id="fcity"></div></div>
+          <div class="rtime" id="ftime"></div>
+          <div class="arrow">➜</div>
+          <div class="ept"><div class="city" id="tcity"></div></div>
+          <div class="rtime" id="ttime"></div>
+        </div>
+        <div id="wonder"><span class="spark">✨</span><span id="wtxt"></span></div>
+        <div id="bar"></div>
       </div>
-
-      <div id="wonder" class="wonder-banner">A fact goes here.</div>
-
-      <div class="drain"><div id="drainBar" class="drain-bar"></div></div>
-    </aside>
+    </div>
   </div>
 
   <script src="/app.js"></script>

@@ -1,180 +1,142 @@
-/* Overhead — Phase 1 frontend styles.
-   Designed at 800x480 logical; #stage is scaled to fit the display by app.js.
-   Day/night driven by [data-daynight] on #stage; quiet hours add .quiet. */
+/* Overhead — Phase 1 frontend.
+   Evolved from flight-tracker-v4.html: same palette, fonts, sprites, panel and
+   day/night system, with the §4 simplifications applied. */
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('/fonts/fredoka-latin.woff2') format('woff2');
+  font-weight: 400 700; font-display: swap;
+}
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/nunito-latin.woff2') format('woff2');
+  font-weight: 600 800; font-display: swap;
+}
 
 :root {
-  --ink-day:   #24303a;
-  --ink-night: #cdd8e6;
-  --chip-day:  rgba(255,255,255,.72);
-  --chip-night:rgba(20,30,46,.62);
-  --coral:     #ff7a6b;
-  --wonder-bg: #ffd23f;
-  --wonder-ink:#4a3600;
-  --panel-day: #ffffff;
-  --panel-night:#141d2e;
+  --g1:#EFF6E9; --g2:#D8EBD9; --g3:#C4E0D2;
+  --ring:rgba(70,100,90,.26); --ringlbl:rgba(60,90,80,.55);
+  --road:rgba(70,100,90,.3); --park:#AEDBA0; --water:#7CC8E0;
+  --ink:#2E3A46; --accent:#FF7B54; --sun:#FFD166;
+  --card:#FFFFFF; --chip:rgba(255,255,255,.88); --skyband:#DDF1FA;
+  --lmark:#5E7A70;
+}
+#device.night {
+  --g1:#2A3358; --g2:#222B4C; --g3:#1A2240;
+  --ring:rgba(160,175,225,.22); --ringlbl:rgba(170,185,235,.55);
+  --road:rgba(160,175,225,.28); --park:#1E3A45; --water:#141F3A;
+  --ink:#EDEFF7; --card:#2E3760; --chip:rgba(38,46,84,.9); --skyband:#1B2440;
+  --lmark:#96A4D6;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: #000; overflow: hidden; font-family: 'Nunito', sans-serif; }
 
-html, body {
-  margin: 0;
-  height: 100%;
-  background: #000;
-  overflow: hidden;
-  font-family: "Baloo 2", "Segoe UI Rounded", "Nunito", system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
+#stage { position: absolute; top: 0; left: 0; transform-origin: top left; }
 
-#stage {
-  position: absolute;
-  top: 0; left: 0;
-  width: 800px;
-  height: 480px;
-  transform-origin: top left;
-  overflow: hidden;
-  color: var(--ink-day);
+#device {
+  width: 800px; height: 480px; position: relative; overflow: hidden;
+  background: radial-gradient(circle at 50% 48%, var(--g1), var(--g2) 55%, var(--g3) 100%);
+  transition: background 1.2s;
 }
+#map { position: absolute; inset: 0; }
 
-#stage[data-daynight="night"] { color: var(--ink-night); }
+/* detail visibility (map_detail) */
+#device[data-detail="minimal"] .lm-full { display: none; }
+#device[data-detail="lofi"] .lm,
+#device[data-detail="lofi"] .lm-full { display: none; }
 
-#map {
-  position: absolute;
-  inset: 0;
-  width: 800px;
-  height: 480px;
-}
+/* rings / roads / labels */
+.ring { position: absolute; border-radius: 50%; border: 2px dashed var(--ring); transition: border-color .9s; }
+.rlbl { position: absolute; font-family: 'Fredoka'; font-weight: 600; font-size: 10.5px; color: var(--ringlbl); letter-spacing: .5px; }
+.cardinal { position: absolute; font-family: 'Fredoka'; font-weight: 700; font-size: 13px; color: var(--ringlbl); }
+.road { position: absolute; background: var(--road); transition: background .9s; }
+.roadlbl { position: absolute; font-family: 'Fredoka'; font-weight: 600; font-size: 10px; color: var(--ringlbl); letter-spacing: .4px; }
 
-/* --- clock chip --- */
-.clock-chip {
-  position: absolute;
-  top: 16px; left: 16px;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background: var(--chip-day);
-  backdrop-filter: blur(4px);
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: .5px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.10);
-}
-#stage[data-daynight="night"] .clock-chip { background: var(--chip-night); }
+/* landmarks */
+.lake { position: absolute; left: -20px; right: -20px; bottom: -26px; height: 66px; background: var(--water);
+  border-radius: 50% 42% 0 0 / 100% 62% 0 0; transition: background .9s; }
+.lake::before { content: ""; position: absolute; top: 16px; left: 10%; width: 52px; height: 4px; border-radius: 4px;
+  background: rgba(255,255,255,.45); box-shadow: 180px 10px 0 rgba(255,255,255,.38), 440px 6px 0 rgba(255,255,255,.42); }
+.park { position: absolute; background: var(--park); border-radius: 42% 55% 48% 50%; transition: background .9s; }
+.lmlbl { position: absolute; font-family: 'Fredoka'; font-weight: 600; font-size: 10px; color: var(--lmark); transition: color .9s; white-space: nowrap; }
+.cntower { position: absolute; width: 12px; display: flex; flex-direction: column; align-items: center; }
+.cntower i { display: block; background: var(--lmark); transition: background .9s; }
+.cntower .spire { width: 2px; height: 14px; } .cntower .pod { width: 9px; height: 8px; border-radius: 5px; } .cntower .shaft { width: 3px; height: 22px; }
+.rwy { position: absolute; background: var(--lmark); border-radius: 2px; transition: background .9s; }
 
-/* --- idle hint --- */
-.idle-hint {
-  position: absolute;
-  bottom: 26px; left: 50%;
-  transform: translateX(-50%);
-  font-size: 20px;
-  font-weight: 600;
-  opacity: .6;
-  transition: opacity .5s;
-}
-.hidden { opacity: 0 !important; pointer-events: none; }
+/* overhead zone + house */
+#zone { position: absolute; left: 400px; top: 230px; width: 150px; height: 150px; margin: -75px 0 0 -75px;
+  border: 3px dashed rgba(255,123,84,.7); border-radius: 50%; }
+.pulse { position: absolute; inset: 0; border-radius: 50%; border: 3px solid rgba(255,123,84,.5); animation: pulse 3s ease-out infinite; }
+@keyframes pulse { 0% { transform: scale(.55); opacity: .9; } 100% { transform: scale(1.25); opacity: 0; } }
+#house { position: absolute; left: 400px; top: 230px; transform: translate(-50%,-58%); text-align: center; }
+#house .roof { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 13px solid #E2574C; margin: 0 auto; }
+#house .body { width: 23px; height: 16px; background: #FCEFDC; margin: 0 auto; border-radius: 0 0 4px 4px; position: relative; }
+#device.night #house .body { background: #5A4E7E; }
+#house .body::after { content: ""; position: absolute; left: 8px; top: 4px; width: 7px; height: 7px; background: var(--sun); border-radius: 2px; }
+#house .label { font-family: 'Fredoka'; font-size: 10.5px; font-weight: 600; color: var(--ink); margin-top: 2px; letter-spacing: .4px; transition: color .9s; }
 
-/* --- overhead panel --- */
-.panel {
-  position: absolute;
-  top: 0; right: 0;
-  width: 322px;
-  height: 480px;
-  background: var(--panel-day);
-  box-shadow: -8px 0 28px rgba(0,0,0,.18);
-  transform: translateX(105%);
-  transition: transform .55s cubic-bezier(.22,1,.36,1);
-  display: flex;
-  flex-direction: column;
-  padding: 14px 16px 0;
-  color: var(--ink-day);
-}
-.panel.show { transform: translateX(0); }
-#stage[data-daynight="night"] .panel {
-  background: var(--panel-night);
-  color: var(--ink-night);
-}
+/* planes */
+#sky { position: absolute; inset: 0; }
+.trail { fill: none; stroke-linecap: round; opacity: .45; stroke-dasharray: 1 10; }
+.trail.hot { opacity: .62; }
 
-.panel-head { display: flex; align-items: center; gap: 12px; }
-.logo-circle {
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  display: grid; place-items: center;
-  color: #fff; font-weight: 800; font-size: 18px;
-  flex: 0 0 auto;
-  box-shadow: inset 0 0 0 2px rgba(255,255,255,.25);
-}
-.airline-name { font-size: 20px; font-weight: 800; line-height: 1.05; }
-.flight-line  { font-size: 14px; opacity: .72; margin-top: 2px; }
+/* clock chip */
+.chip { position: absolute; top: 14px; left: 16px; background: var(--chip); border-radius: 999px; padding: 7px 15px;
+  font-family: 'Fredoka'; font-weight: 600; font-size: 17px; color: var(--ink);
+  box-shadow: 0 3px 10px rgba(20,30,40,.18); display: flex; gap: 8px; align-items: center;
+  transition: background .9s, color .9s; z-index: 5; }
 
-/* photo band */
-.photo-band {
-  position: relative;
-  margin: 12px 0;
-  height: 128px;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #dfe7ee;
-}
-#stage[data-daynight="night"] .photo-band { background: #0d1524; }
-.plane-art { position: absolute; inset: 0; }
-.plane-art svg { width: 100%; height: 100%; display: block; }
-.photo-caption {
-  position: absolute;
-  left: 10px; bottom: 8px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: rgba(0,0,0,.55);
-  color: #fff;
-  font-size: 12px; font-weight: 600;
-}
-.photo-attrib {
-  position: absolute;
-  right: 8px; bottom: 6px;
-  font-size: 9px;
-  color: rgba(255,255,255,.7);
-  text-shadow: 0 1px 2px rgba(0,0,0,.6);
-}
+/* idle hint */
+.hint { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+  font-family: 'Fredoka'; font-weight: 600; font-size: 18px; color: var(--ink); opacity: .5; transition: opacity .5s; z-index: 4; }
+.hint.gone { opacity: 0; }
 
-/* route block — larger than prototype (§4.2) */
-.route-block {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 6px;
-  margin: 4px 0 10px;
+/* --- overhead panel (§4.2, simplified) --- */
+#panel {
+  position: absolute; top: 12px; bottom: 12px; right: 12px; width: 330px;
+  background: var(--card); color: var(--ink); border-radius: 20px;
+  box-shadow: -8px 0 28px rgba(15,25,40,.28);
+  transform: translateX(120%); transition: transform .55s cubic-bezier(.2,1.1,.35,1), background .9s;
+  display: flex; flex-direction: column; overflow: hidden; z-index: 6;
 }
-.route-end { text-align: center; }
-.route-city { font-size: 23px; font-weight: 800; line-height: 1.1; }
-.route-time { font-size: 13px; opacity: .7; margin-top: 4px; }
-.route-arrow { font-size: 24px; opacity: .5; }
+#panel.show { transform: translateX(0); }
 
-/* wonder banner — the star (§4.2) */
-.wonder-banner {
-  margin-top: auto;
-  margin-bottom: 14px;
-  background: var(--wonder-bg);
-  color: var(--wonder-ink);
-  border-radius: 16px;
-  padding: 16px 18px;
-  font-size: 19px;
-  font-weight: 700;
-  line-height: 1.3;
-  box-shadow: 0 6px 16px rgba(255,180,20,.35);
-}
+#panel .head { display: flex; align-items: center; gap: 11px; padding: 15px 16px 10px; }
+#panel .logo { width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fredoka'; font-weight: 700; font-size: 16px; color: #fff; }
+#panel .who { font-family: 'Fredoka'; font-weight: 600; font-size: 19px; line-height: 1.12; min-width: 0; }
+#panel .who small { display: block; font-family: 'Nunito'; font-weight: 700; font-size: 12.5px; opacity: .6; margin-top: 3px; }
+
+/* photo band: side-profile livery fallback + caption (reg·age moved here per §4.2) */
+#band { position: relative; height: 116px; margin: 2px 14px 0; border-radius: 14px;
+  background: var(--skyband); overflow: hidden; transition: background .9s; flex: 0 0 auto; }
+#band svg { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); }
+#band .cap { position: absolute; left: 10px; bottom: 8px; padding: 3px 10px; border-radius: 999px;
+  background: rgba(0,0,0,.55); color: #fff; font-family: 'Fredoka'; font-weight: 600; font-size: 12.5px; }
+#band .attrib { position: absolute; right: 8px; bottom: 6px; font-size: 9px; color: rgba(0,0,0,.35);
+  font-weight: 700; letter-spacing: .3px; }
+#device.night #band .attrib { color: rgba(255,255,255,.4); }
+
+/* route block — larger than prototype, stacked origin ➜ destination (§4.2) */
+#route { padding: 14px 18px 0; }
+#route .ept .city { font-family: 'Fredoka'; font-weight: 700; font-size: 23px; line-height: 1.15; }
+#route .rtime { font-size: 13px; font-weight: 800; opacity: .6; margin-top: 3px; }
+#route .arrow { color: var(--accent); font-family: 'Fredoka'; font-size: 22px; line-height: 1; margin: 4px 0 4px 2px; }
+
+/* wonder banner — the star (min 17px, §4.2) */
+#wonder { margin: 12px 14px 0; background: var(--sun); color: #5B4200; border-radius: 15px;
+  padding: 15px 16px; font-family: 'Fredoka'; font-weight: 600; font-size: 19px; line-height: 1.32;
+  display: flex; gap: 9px; align-items: flex-start; box-shadow: 0 6px 16px rgba(255,180,20,.3); }
+#wonder .spark { flex: 0 0 auto; }
 
 /* dwell drain bar */
-.drain {
-  height: 5px;
-  background: rgba(0,0,0,.08);
-  border-radius: 3px;
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-#stage[data-daynight="night"] .drain { background: rgba(255,255,255,.10); }
-.drain-bar {
-  height: 100%;
-  width: 100%;
-  background: var(--coral);
-  transform-origin: left;
-}
+#bar { margin-top: auto; height: 5px; background: var(--accent); width: 100%; transform-origin: left; }
+@keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
-/* quiet hours: dim everything (§4.3) */
-#stage.quiet { filter: brightness(.55); }
+/* quiet hours dimming (§4.3) */
+#device.quiet { filter: brightness(.55); }
+
+@media (prefers-reduced-motion: reduce) { .pulse { animation: none !important; } #panel { transition: none; } }

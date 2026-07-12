@@ -43,6 +43,14 @@ class Plane:
     # kinematics, in the home-centred km grid
     bearing_deg: float          # direction of travel (0 = north, 90 = east)
     miss_km: float              # perpendicular offset of the track from home
+
+    # livery, reused from the prototype's sprite/side-profile model
+    body: str = "#FBFBFB"   # fuselage fill
+    eng: str = "#333333"    # engine fill
+    stripe: str = "#333333" # window-line accent
+    logoc: str = "#333333"  # brand colour for the logo circle
+    size: float = 1.0       # sprite scale (prototype scale; frontend adds ~20%)
+
     start_back_km: float = 24.0 # how far back along the track it spawns
     path_len_km: float = 48.0   # total distance before respawn
     gs_kt: float = 430.0        # ground speed, knots
@@ -79,72 +87,80 @@ class Plane:
 def _fleet() -> list[Plane]:
     """A curated demo fleet matching the brief's prototype dataset flavour."""
     return [
+        # Liveries and wonder copy carried over from the v4 prototype dataset.
         Plane(
-            hex="896180", callsign="UAE241", registration="A6-EEQ",
-            typ="A388", type_name="Airbus A380", airline="Emirates",
-            airline_code="EK", tail="#d71920",
+            hex="896180", callsign="EK242", registration="A6-EVN",
+            typ="A388", type_name="Airbus A380-800", airline="Emirates",
+            airline_code="EK", tail="#C8A55B",
+            body="#FDFDFD", eng="#D71920", stripe="#D71920", logoc="#D71920", size=1.4,
             origin={"code": "DXB", "city": "Dubai", "flag": "🇦🇪"},
             dest={"code": "YYZ", "city": "Toronto", "flag": "🇨🇦"},
-            seats="up to 500 people", age=6, score=95,
-            wonder="This is the biggest passenger plane in the world — it has TWO floors of seats!",
-            took_off="took off 13 h ago", lands="lands ~in 25 min",
-            cruise_alt_m=3200, photo_caption="A6-EEQ · 6 years old",
+            seats="up to 519 people", age=7, score=95,
+            wonder="The largest passenger plane in the world — it has two whole floors!",
+            took_off="took off 13 h ago", lands="lands in ~25 min",
+            cruise_alt_m=3200, photo_caption="A6-EVN · 7 years old",
             bearing_deg=70, miss_km=0.8, gs_kt=290),
         Plane(
-            hex="3c6dd2", callsign="DLH470", registration="D-ABYK",
-            typ="B748", type_name="Boeing 747-8", airline="Lufthansa",
-            airline_code="LH", tail="#0b2d6b",
+            hex="3c6dd2", callsign="LH471", registration="D-ABYT",
+            typ="B748", type_name="Boeing 747-8 Jumbo", airline="Lufthansa",
+            airline_code="LH", tail="#0A1D3F",
+            body="#F4F7FA", eng="#0A1D3F", stripe="#F9BA00", logoc="#0A1D3F", size=1.3,
             origin={"code": "FRA", "city": "Frankfurt", "flag": "🇩🇪"},
             dest={"code": "YYZ", "city": "Toronto", "flag": "🇨🇦"},
-            seats="up to 364 people", age=9, score=88,
-            wonder="They call this one the Queen of the Skies — look at the hump on top!",
-            took_off="took off 8 h ago", lands="lands ~in 18 min",
-            cruise_alt_m=2600, photo_caption="D-ABYK · 9 years old",
+            seats="up to 364 people", age=12, score=88,
+            wonder="The famous Jumbo Jet — pilots call it the Queen of the Skies 👑",
+            took_off="took off 8 h ago", lands="lands in ~18 min",
+            cruise_alt_m=2600, photo_caption="D-ABYT · 12 years old",
             bearing_deg=110, miss_km=-1.6, gs_kt=300),
         Plane(
-            hex="c052fa", callsign="ACA456", registration="C-FGDT",
-            typ="A320", type_name="Airbus A320", airline="Air Canada",
-            airline_code="AC", tail="#d0021b",
-            origin={"code": "YYZ", "city": "Toronto", "flag": "🇨🇦"},
-            dest={"code": "YUL", "city": "Montréal", "flag": "🇨🇦"},
-            seats="up to 146 people", age=12, score=35,
-            wonder="Just took off from Toronto — off to Montréal for a quick hop!",
-            took_off="took off 6 min ago", lands="lands ~in 55 min",
-            cruise_alt_m=2900, photo_caption="C-FGDT · 12 years old",
-            bearing_deg=55, miss_km=2.0, gs_kt=340),
-        Plane(
-            hex="a1b2c3", callsign="POE324", registration="C-GLQD",
-            typ="DH8D", type_name="Dash 8-400", airline="Porter",
-            airline_code="PD", tail="#0e2340",
-            origin={"code": "YTZ", "city": "Toronto Island", "flag": "🇨🇦"},
-            dest={"code": "YOW", "city": "Ottawa", "flag": "🇨🇦"},
-            seats="up to 78 people", age=15, score=58,
-            wonder="This little plane took off from the island airport downtown minutes ago!",
-            took_off="took off 4 min ago", lands="lands ~in 45 min",
-            cruise_alt_m=2100, photo_caption="C-GLQD · 15 years old",
-            bearing_deg=35, miss_km=-1.0, gs_kt=250),
-        Plane(
-            hex="4ca7b1", callsign="CJT701", registration="C-FCAE",
-            typ="B763", type_name="Boeing 767 freighter", airline="Cargojet",
-            airline_code="W8", tail="#8a1a1a",
+            hex="c052fa", callsign="AC124", registration="C-GFAF",
+            typ="A333", type_name="Airbus A330-300", airline="Air Canada",
+            airline_code="AC", tail="#141414",
+            body="#FBFBFB", eng="#141414", stripe="#D22630", logoc="#D22630", size=1.05,
             origin={"code": "YYZ", "city": "Toronto", "flag": "🇨🇦"},
             dest={"code": "YVR", "city": "Vancouver", "flag": "🇨🇦"},
-            seats="0 people · 2 pilots", age=22, score=52,
-            wonder="No passengers on this one — it's packed with boxes and parcels flying across Canada!",
-            took_off="took off 15 min ago", lands="lands ~in 4 h 20 min",
-            cruise_alt_m=3000, photo_caption="C-FCAE · 22 years old",
-            bearing_deg=290, miss_km=1.4, gs_kt=360),
+            seats="up to 297 people", age=26, score=72,
+            wonder="This exact plane last flew over our house on June 28 — welcome back! 👋",
+            took_off="took off 9 min ago", lands="lands in ~4 h 40 min",
+            cruise_alt_m=2900, photo_caption="C-GFAF · 26 years old",
+            bearing_deg=290, miss_km=2.0, gs_kt=340),
         Plane(
-            hex="400af2", callsign="BAW99", registration="G-STBF",
-            typ="B77W", type_name="Boeing 777", airline="British Airways",
-            airline_code="BA", tail="#1d2b5c",
-            origin={"code": "LHR", "city": "London", "flag": "🇬🇧"},
-            dest={"code": "YYZ", "city": "Toronto", "flag": "🇨🇦"},
-            seats="up to 297 people", age=11, score=70,
-            wonder="This plane flew all the way across the ocean from London — over the whole Atlantic!",
-            took_off="took off 7 h ago", lands="lands ~in 20 min",
-            cruise_alt_m=2800, photo_caption="G-STBF · 11 years old",
-            bearing_deg=95, miss_km=-0.5, gs_kt=300),
+            hex="a1b2c3", callsign="PD365", registration="C-GKQL",
+            typ="E290", type_name="Embraer E195-E2", airline="Porter",
+            airline_code="PD", tail="#12355B",
+            body="#FBFBFB", eng="#12355B", stripe="#12355B", logoc="#12355B", size=0.85,
+            origin={"code": "YTZ", "city": "Toronto Island", "flag": "🇨🇦"},
+            dest={"code": "YOW", "city": "Ottawa", "flag": "🇨🇦"},
+            seats="up to 132 people", age=2, score=58,
+            wonder="One of the newest, quietest planes in the sky — almost brand new!",
+            took_off="took off 9 min ago from the island airport",
+            lands="lands in ~40 min",
+            cruise_alt_m=2100, photo_caption="C-GKQL · 2 years old",
+            bearing_deg=35, miss_km=-1.0, gs_kt=250),
+        Plane(
+            hex="4ca7b1", callsign="FX9042", registration="N132FE",
+            typ="B763", type_name="Boeing 767 Cargo", airline="FedEx",
+            airline_code="FX", tail="#4D148C",
+            body="#F6F6F8", eng="#FF6600", stripe="#4D148C", logoc="#4D148C", size=1.05,
+            origin={"code": "YYZ", "city": "Toronto", "flag": "🇨🇦"},
+            dest={"code": "MEM", "city": "Memphis", "flag": "🇺🇸"},
+            seats="0 people · 2 pilots", age=9, score=52,
+            wonder="No passengers at all — just 52,000 kg of packages! 📦",
+            took_off="took off 31 min ago", lands="lands in ~1 h 20 min",
+            cruise_alt_m=3000, photo_caption="N132FE · 9 years old",
+            bearing_deg=250, miss_km=1.4, gs_kt=360),
+        Plane(
+            hex="400af2", callsign="NH9", registration="JA789A",
+            typ="B77W", type_name="Boeing 777-300ER", airline="ANA",
+            airline_code="NH", tail="#10387D",
+            body="#F7FAFC", eng="#10387D", stripe="#10387D", logoc="#10387D", size=1.15,
+            origin={"code": "JFK", "city": "New York", "flag": "🇺🇸"},
+            dest={"code": "HND", "city": "Tokyo", "flag": "🇯🇵"},
+            seats="up to 264 people", age=14, score=80,
+            wonder="Not stopping here — it's flying right over us on its way across the world! 🌏",
+            took_off="took off 1 h 05 min ago", lands="lands in ~12 h · tomorrow there",
+            cruise_alt_m=2800, photo_caption="JA789A · 14 years old",
+            bearing_deg=330, miss_km=-0.5, gs_kt=300),
     ]
 
 
@@ -188,7 +204,8 @@ class Simulator:
                 "hex": p.hex, "callsign": p.callsign, "registration": p.registration,
                 "lat": lat, "lon": lon, "track": p.bearing_deg,
                 "alt_m": p.cruise_alt_m, "gs_kt": p.gs_kt,
-                "airline": p.airline, "tail": p.tail, "type": p.typ,
+                "airline": p.airline, "type": p.typ,
+                "tail": p.tail, "body": p.body, "size": p.size,
                 "score": p.score, "dist_km": round(dist, 2),
             })
 
@@ -211,11 +228,14 @@ class Simulator:
     def _panel_payload(self, p: Plane) -> dict:
         return {
             "hex": p.hex,
-            "airline": p.airline, "airline_code": p.airline_code, "tail": p.tail,
+            "airline": p.airline, "airline_code": p.airline_code,
             "flight": p.callsign, "type_name": p.type_name,
             "registration": p.registration, "age": p.age,
             "photo_caption": p.photo_caption,
             "origin": p.origin, "dest": p.dest,
             "took_off": p.took_off, "lands": p.lands,
             "seats": p.seats, "wonder": p.wonder, "score": p.score,
+            # livery for the side-profile illustration (§4.2 photo fallback)
+            "tail": p.tail, "body": p.body, "eng": p.eng,
+            "stripe": p.stripe, "logoc": p.logoc, "size": p.size,
         }
